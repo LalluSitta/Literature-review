@@ -1,0 +1,270 @@
+{% extends 'homepage/index.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/folders_css/folders.css' %}"> 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+<html>
+<body>  
+    <header>
+        {% block nav %}
+        <nav  class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a href="{% url 'folders:home' %}" class="btn btn-light me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <i class="navbar-brand">Piattaforma Literature Review</i>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
+        {% endblock %}
+    </header>
+<!-- Hero Section --> 
+{% block hero %}
+    <div class="hero-image">
+        <img src="static/media/sfondo.jpg" alt="copertina"></img>
+    </div>
+{% endblock %}
+
+{% block container %}
+    <div class="hero2"> 
+        <h1>Gestione dei Database</h1>
+        <p>Organizza e gestisci le tue cartelle in modo semplice e veloce.</p>
+    </div>
+{% endblock %}
+
+<!-- Main Content -->
+{% block content %}
+   <!-- Bottone per creare una nuova cartella sotto tutte le cartelle -->
+    <div class="create-folder-container">
+        <button type="button" class="btn btn-purple mt-3" data-bs-toggle="modal" data-bs-target="#modalCreaCartella">
+            + Crea Cartella
+        </button>
+    </div>
+
+    <!-- Modal creazione cartella-->
+    <div class="modal fade" id="modalCreaCartella" tabindex="-1" aria-labelledby="modalCreaCartellaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCreaCartellaLabel">Crea una Nuova Cartella</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formCreaCartella">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="nomeCartella" class="form-label">Nome Cartella</label>
+                            <input type="text" class="form-control" id="nomeCartella" name="nome">
+                            <div class="text-danger" id="errorNome"></div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Crea</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenitore delle cartelle -->
+    <div id="foldersContainer">
+        {% for cartella in cartelle %}
+            <div class="folder-wrapper">
+                <div class="folder-item" id="folder-{{ cartella.id }}">
+                    <span class="folder-icon" tabindex="-1">📘</span>
+                    <i class="folder-name">
+                        {{ cartella.nome }}
+                    </i>
+                </div>
+                <div class="folder-buttons">
+                    <!-- Pulsante per modificare la cartella -->
+                    <button class="btn btn-warning btn-sm edit-folder" data-id="{{ cartella.id }}" data-nome="{{ cartella.nome }}">
+                        ✏️ Modifica
+                    </button>
+                    <!-- Pulsante per eliminare la cartella -->
+                    <button class="btn btn-danger btn-sm delete-folder" data-id="{{ cartella.id }}">
+                        ✖️ Elimina
+                    </button>
+                </div>        
+                <div class="folder-buttons">
+                    <!-- Link alle ricerche salvate e agli articoli della cartella -->
+                    <a href="{% url 'articoli:ricerche_salvate' cartella.id %}" class="btn btn-info btn-sm">
+                        Ricerche Salvate
+                    </a>
+                    <a href="{% url 'articoli:articoli_per_cartella' cartella.id %}" class="btn btn-primary btn-sm" data-id="{{ cartella.id }}">
+                        Tutte le ricerche
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Modal Modifica -->
+    <div class="modal fade" id="modalModificaCartella" tabindex="-1">   
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifica Cartella</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editFolderId">  <!-- Nasconde l'ID della cartella -->
+                    <input type="text" class="form-control" id="editFolderName">  <!-- Nuovo nome -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="saveFolderChanges">Salva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block contact %}
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
+    <!-- Bootstrap Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block script %}
+    <!-- AJAX Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        
+            function addEventListenersToButtons(container) {
+                // Modifica cartella
+                container.querySelector(".edit-folder").addEventListener("click", function() {
+                    document.getElementById("editFolderId").value = this.dataset.id;
+                    document.getElementById("editFolderName").value = this.dataset.nome;
+                    new bootstrap.Modal(document.getElementById("modalModificaCartella")).show();
+                });
+        
+                // Eliminazione cartella
+                container.querySelector(".delete-folder").addEventListener("click", function() {
+                    let folderId = this.dataset.id;
+                    fetch(`/cartella/${folderId}/elimina/`, {
+                        method: "POST",
+                        headers: { "X-CSRFToken": csrfToken }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Rimuove completamente la cartella e i suoi pulsanti associati
+                            document.getElementById(`folder-${folderId}`).parentElement.remove();
+                        }
+                    });
+                });
+            }
+        
+            // Assegna eventi ai pulsanti già presenti nella pagina
+            document.querySelectorAll(".folder-wrapper").forEach(addEventListenersToButtons);
+        
+            // Modifica cartella - Salvataggio
+            document.getElementById("saveFolderChanges").addEventListener("click", function() {
+                let folderId = document.getElementById("editFolderId").value;
+                let newName = document.getElementById("editFolderName").value;
+        
+                fetch(`/cartella/${folderId}/modifica/`, {
+                    method: "POST",
+                    body: JSON.stringify({ nome: newName }),
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Aggiorna il nome della cartella immediatamente
+                        let folderElement = document.querySelector(`#folder-${folderId} .folder-name`);
+                        folderElement.textContent = data.nome;
+        
+                        // Aggiorna il dataset del bottone modifica con il nuovo nome
+                        let editButton = document.querySelector(`#folder-${folderId}`).parentElement.querySelector(".edit-folder");
+                        editButton.setAttribute("data-nome", data.nome);
+        
+                        // Chiude il modale di modifica
+                        bootstrap.Modal.getInstance(document.getElementById("modalModificaCartella")).hide();
+                    } else {
+                        alert("Errore nella modifica: " + data.error);
+                    }
+                });
+            });
+        
+            // Gestione della creazione di una nuova cartella
+            document.getElementById("formCreaCartella").addEventListener("submit", function(event) {
+                event.preventDefault(); // Evita il refresh della pagina
+            
+                let formData = new FormData(this);
+                fetch("{% url 'folders:crea_cartella_ajax' %}", {
+                    method: "POST",
+                    body: formData,
+                    headers: { "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let foldersContainer = document.getElementById("foldersContainer");
+                        let newFolder = document.createElement("div");  
+                        newFolder.classList.add("folder-wrapper");
+
+                        // Costruzione HTML corretta per la nuova cartella
+                        newFolder.innerHTML = `
+                            <div class="folder-item" id="folder-${data.id}">
+                                <a href="/cartella/${data.id}/" class="folder-icon" tabindex="-1" style="font-size: 60px; display: block; text-decoration: none;">📘</a>
+                                <i class="folder-name">${data.nome}</i>
+                            </div>
+                            <div class="folder-buttons">
+                                <button class="btn btn-warning btn-sm edit-folder" data-id="${data.id}" data-nome="${data.nome}">
+                                    ✏️ Modifica
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-folder" data-id="${data.id}">
+                                    ✖️ Elimina
+                                </button>
+                            </div>
+                            <div class="folder-buttons">
+                                <a href="/cartella/${data.id}/" class="btn btn-success btn-sm">
+                                    Ricerche salvate
+                                </a>
+                                <a href="#" class="btn btn-primary btn-sm">
+                                    Tutte le ricerche
+                                </a>
+                            </div>
+                        `;
+            
+                        // Aggiungi la nuova cartella alla lista
+                        foldersContainer.appendChild(newFolder);
+                        
+                        // Aggiungi gli event listener ai nuovi bottoni
+                        addEventListenersToButtons(newFolder);
+                        
+                        // Chiudi il modale e resetta il form
+                        bootstrap.Modal.getInstance(document.getElementById("modalCreaCartella")).hide();
+                        document.getElementById("formCreaCartella").reset();
+                        document.getElementById("errorNome").textContent = "";
+
+                        // Ricarica la pagina dopo un breve timeout per aggiornare i dati
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 200);
+                        
+                    } else {
+                        // Se la cartella ha un nome duplicato da errore
+                        document.getElementById("errorNome").textContent = data.error;
+                    }
+                });
+            });
+        });
+    </script> 
+{% endblock %}   
+</body>
+</html>

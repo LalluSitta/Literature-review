@@ -1,0 +1,470 @@
+{% extends 'homepage/index.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/folders_css/folders.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/articoli_css/lista_articoli.css' %}">
+{% endblock %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a href="{% url 'folders:lista_cartelle' %}" class="btn btn-light me-3">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <i class="navbar-brand">Piattaforma Literature Review</i>
+    </div>
+</nav>  
+{% endblock %}
+
+
+{% block hero %}
+    <div>
+        <img src="{% static 'media/sfondo2.jpg' %}" alt="copertina" class="hero-image"></img>
+    </div>
+{% endblock %}
+
+
+{% block container %}
+<section class="hero2">
+    <div class="container mt-5">
+        <h2 class="text-center text-white fw-bold">📚 Ricerche Salvate nella Cartella: {{ folder.nome }}</h2>
+    </div>
+</section>
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-5">
+       <!-- Barra di ricerca e filtri -->
+       <div class="row justify-content-center my-4">
+        <div class="col-md-4">
+            <input type="text" id="search" class="form-control shadow" placeholder="🔍 Cerca...">
+        </div>
+        <div class="col-md-2">
+            <select id="language" class="form-select shadow">
+                <option value="">Lingua: Tutte</option>
+                <option value="IT">Italiano</option>
+                <option value="EN">Inglese</option>
+                <option value="FR">Francese</option>
+                <option value="ES">Spagnolo</option>
+                <option value="DE">Tedesco</option>
+                <option value="LT">Lituano</option>
+                <option value="JP">Giapponese</option>
+                <option value="CH">Cinese</option>
+                <option value="RU">Russo</option>
+
+            </select>
+        </div>
+    </div>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    {% if ricerche %}
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered shadow bg-white">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>Titolo</th>
+                    <th>Autore</th>
+                    <th>Anno</th>
+                    <th>Citazioni</th>
+                    <th>Fonti</th>
+                    <th>Lingua</th>
+                    <th>Tipo</th>
+                    <th>Testo della Ricerca</th>
+                    <th>Elimina</th>
+                    <th>Stato</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ricerca in ricerche %}
+                <tr data-id="{{ ricerca.articolo.id }}">
+                    <td>➤ <a href="#" class="open-article-modal">{{ ricerca.articolo.titolo }}</a></td>
+                    <td>{{ ricerca.articolo.autore|default_if_none:"" }}</td>
+                    <td>{{ ricerca.articolo.anno|default_if_none:"" }}</td>
+                    <td>{{ ricerca.articolo.citazioni|default_if_none:"0" }}</td>
+                    <td>{{ ricerca.articolo.fonte|default_if_none:"" }}</td>
+                    <td>{{ ricerca.articolo.lingua|default_if_none:"" }}</td>
+                    <td>{{ ricerca.articolo.tipo_documento|default_if_none:"" }}</td>
+                    <td class="td-ellipsis">{{ ricerca.articolo.text|default_if_none:"" }}</td>
+                    <td>
+                        <button class="btn btn-danger btn-elimina">Elimina</button>
+                    </td>
+                    <td>
+                        {% if ricerca.articolo.status == "Preso" %}
+                            <!-- Checkbox disabilitato e selezionato se l’articolo è Preso -->
+                            <input type="checkbox" class="form-check-input" checked disabled>
+                            <span class="text-success fw-bold"> Preso </span>
+
+                            <!-- Bottone per salvare il tag -->
+                        {% else %}
+                            <!-- Mostra una X se l’articolo non è Preso -->
+                            <span class="text-danger fw-bold">❌Scartato</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <nav aria-label="Navigazione paginazione">
+        <ul class="pagination justify-content-center" id="pagination">
+            <!-- I bottoni di paginazione verranno generati dinamicamente -->
+        </ul>
+    </nav>
+    <div class="modal fade" id="articleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <input type="hidden" id="articleId">
+                    <h5 class="modal-title" id="articleTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Autore:</strong> <span id="articleAuthor"></span></p>
+                    <p><strong>Anno:</strong> <span id="articleYear"></span></p>
+                    <p><strong>Fonte:</strong> <span id="articleSource"></span></p>
+                    <p><strong>Citazioni:</strong> <span id="articleCitations"></span></p>
+                    <p><strong>Lingua:</strong> <span id="articleLanguage"></span></p>
+                    <p><strong>Tipo Documento:</strong> <span id="articleType"></span></p>
+                    <p><strong>Testo della Ricerca:</strong></p>
+                    <textarea id="articleText" class="form-control" rows="5" readonly></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button id="prevArticle" class="btn btn-secondary">« Precedente</button>
+                    <button id="nextArticle" class="btn btn-secondary">Successivo »</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center">Nessuna ricerca salvata in questa cartella.</div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block contact %}
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
+
+
+{% block script %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let articles = Array.from(document.querySelectorAll("tbody tr"));
+        let currentIndex = 0;
+        let searchInput = document.getElementById("search");
+        let languageFilter = document.getElementById("language");
+        let tableRows = Array.from(document.querySelectorAll("tbody tr"));
+        let pagination = document.getElementById("pagination");
+        let itemsPerPage = 5; // Imposta il numero di elementi per pagina
+        let currentPage = 1;
+        
+        // Assegna eventi per aprire il modal con i dettagli dell'articolo
+        document.querySelectorAll(".open-article-modal").forEach((link, index) => {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                currentIndex = index;
+                openArticleModal(articles[currentIndex]);
+            });
+        });
+    
+        // Assegna eventi per il bottone "Elimina"
+        document.querySelectorAll(".btn-elimina").forEach((button) => {
+            button.addEventListener("click", function () {
+                let row = this.closest("tr"); // Prende la riga più vicina
+                eliminaArticolo(row);
+            });
+        });
+        
+        gestisciPaginazione(); // Inizializza la paginazione
+
+        // Funzione per aprire il modale con i dettagli dell'articolo
+        function openArticleModal(row) {
+            if (!row) {
+                console.error("❌ Nessuna riga selezionata!");
+                return;
+            }
+    
+            let articleId = row.dataset.id; // Prende l'ID dell'articolo dalla riga della tabella
+            if (!articleId) {
+                console.error("❌ ID articolo non valido!");
+                alert("⚠️ L'ID dell'articolo non è valido!");
+                return;
+            }
+            
+            // Aggiorna i dettagli dell'articolo nel modale
+            document.getElementById("articleId").value = articleId;
+            document.getElementById("articleTitle").textContent = row.cells[0].textContent.trim();
+            document.getElementById("articleAuthor").textContent = row.cells[1].textContent.trim();
+            document.getElementById("articleYear").textContent = row.cells[2].textContent.trim();
+            document.getElementById("articleCitations").textContent = row.cells[3].textContent.trim();
+            document.getElementById("articleSource").textContent = row.cells[4].textContent.trim();
+            document.getElementById("articleLanguage").textContent = row.cells[5].textContent.trim();
+            document.getElementById("articleType").textContent = row.cells[6].textContent.trim();
+            document.getElementById("articleText").value = row.cells[7].textContent.trim();
+    
+            let modal = new bootstrap.Modal(document.getElementById("articleModal"));
+            modal.show();
+        }
+    
+        // Pulsanti "Precedente" e "Successivo"
+        document.getElementById("prevArticle").addEventListener("click", function () {
+            if (currentIndex > 0) {
+                currentIndex--;
+                openArticleModal(articles[currentIndex]);
+            } else {
+                alert("⚠️ Sei già al primo articolo!");
+            }
+        });
+    
+        document.getElementById("nextArticle").addEventListener("click", function () {
+            if (currentIndex < articles.length - 1) {
+                currentIndex++;
+                openArticleModal(articles[currentIndex]);
+            } else {
+                alert("⚠️ Sei già all'ultimo articolo!");
+            }
+        });
+    
+        // Eliminazione dell'articolo con aggiornamento dello stato su "Scartato"
+        function eliminaArticolo(row) {
+            if (!row) {
+                console.error("❌ Nessuna riga selezionata per l'eliminazione!");
+                return;
+            }
+    
+            let articleId = row.dataset.id;  // Assicurati che l'ID sia preso correttamente
+            if (!articleId) {
+                console.error("❌ ID articolo non valido!");
+                return;
+            }
+            
+            // Richiesta POST per eliminare l'articolo
+            fetch("{% url 'articoli:elimina_articolo'%}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                },
+                body: JSON.stringify({ id: articleId })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert("✅ Articolo eliminato con successo!");
+    
+                    // Cambia lo stato visivamente a "Scartato"
+                    let statusCell = row.querySelector(".article-status");
+                    if (statusCell) {
+                        statusCell.innerHTML = '<span class="text-danger fw-bold">❌ Scartato</span>';
+                    }
+    
+                    // Rimuove la riga dopo un breve timeout
+                    setTimeout(() => {
+                        row.remove();
+                    }, 300);
+                } else {
+                    alert("❌ Errore nell'eliminazione: " + data.error);
+                }
+            })
+            .catch(error => console.error("Errore:", error));
+
+            gestisciPaginazione(); // Aggiorna la paginazione dopo l'eliminazione
+        }
+    
+        // Risolve il problema dello sfondo nero quando si chiude il modal
+        document.getElementById("articleModal").addEventListener("hidden.bs.modal", function () {
+            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+            document.body.classList.remove("modal-open");
+        });
+
+        // Funzione per gestire la paginazione degli articoli
+        function gestisciPaginazione() {
+            let table = document.querySelector("tbody");
+            let rows = Array.from(table.getElementsByTagName("tr"));
+            let totalItems = rows.length;
+            let totalPages = Math.ceil(totalItems / itemsPerPage);
+            let pagination = document.getElementById("pagination");
+        
+            if (totalPages <= 1) {
+                pagination.innerHTML = ""; // Se c'è solo una pagina, nasconde la paginazione
+                return;
+            }
+        
+            pagination.innerHTML = ""; // Svuota la paginazione prima di rigenerarla
+        
+            let currentPage = 1; //Imposta la pagina corrente 
+        
+            function showPage(page) {
+                if (page < 1) page = 1;
+                if (page > totalPages) page = totalPages;
+        
+                let start = (page - 1) * itemsPerPage;
+                let end = start + itemsPerPage;
+        
+                rows.forEach((row, index) => {
+                    row.style.display = (index >= start && index < end) ? "" : "none";
+                });
+        
+                currentPage = page;
+                renderPagination(); // Aggiorna i bottoni della paginazione
+            }
+        
+            //Svuota la paginazione esistente 
+            function renderPagination() {
+                pagination.innerHTML = "";
+                
+                //Crea il pulsante "Precedente"
+                let prevLi = document.createElement("li");
+                prevLi.classList.add("page-item");
+                prevLi.innerHTML = `<button class="page-link">❮</button>`;
+                prevLi.addEventListener("click", function () {
+                    if (currentPage > 1) showPage(currentPage - 1); // Se non è la prima pagina, torna indietro
+                });
+                if (currentPage === 1) prevLi.classList.add("disabled");  // Disabilita il pulsante se si è sulla prima pagina
+                pagination.appendChild(prevLi);
+        
+                // Crea i pulsanti numerici delle pagine
+                for (let i = 1; i <= totalPages; i++) {
+                    let li = document.createElement("li");
+                    li.classList.add("page-item");
+                    if (i === currentPage) li.classList.add("active"); // Evidenzia la pagina attuale
+        
+                    let button = document.createElement("button");
+                    button.classList.add("page-link");
+                    button.innerText = i;
+                    button.addEventListener("click", function () {
+                        showPage(i);
+                    });
+        
+                    li.appendChild(button);
+                    pagination.appendChild(li);
+                }
+        
+                // Crea il pulsante "Successivo"
+                let nextLi = document.createElement("li");
+                nextLi.classList.add("page-item");
+                nextLi.innerHTML = `<button class="page-link">❯</button>`;
+                nextLi.addEventListener("click", function () {
+                    if (currentPage < totalPages) showPage(currentPage + 1);
+                });
+                if (currentPage === totalPages) nextLi.classList.add("disabled");
+                pagination.appendChild(nextLi);
+            }
+        
+            showPage(1); // Mostra la prima pagina inizialmente
+        }
+
+        // Funzione per filtrare gli articoli in base alla ricerca e alla lingua selezionata
+        function filtraArticoli() {
+            let query = searchInput.value.trim().toLowerCase(); // Converte il testo in minuscolo per la ricerca case-insensitive
+            let lingua = languageFilter.value.toLowerCase(); // Prende la lingua selezionata
+            let risultatiVisibili = 0; // Conta quanti risultati corrispondono ai filtri
+    
+            tableRows.forEach(row => {
+                let titolo = row.cells[0].textContent.toLowerCase();
+                let autore = row.cells[1].textContent.toLowerCase();
+                let anno = row.cells[2].textContent.toLowerCase();
+                let citazioni = row.cells[3].textContent.toLowerCase();
+                let fonte = row.cells[4].textContent.toLowerCase();
+                let linguaArticolo = row.cells[5].textContent.toLowerCase();
+                let tipo = row.cells[6].textContent.toLowerCase();
+                let testoRicerca = row.cells[7].textContent.toLowerCase();
+    
+                // Controlla se la lingua dell'articolo corrisponde a quella selezionata
+                let matchLingua = (lingua === "" || linguaArticolo.includes(lingua));
+
+                // Controlla se il titolo, autore o altre informazioni contengono il testo cercato
+                let matchQuery = (query === "" ||
+                    titolo.includes(query) ||
+                    autore.includes(query) ||
+                    anno.includes(query) ||
+                    citazioni.includes(query) ||
+                    fonte.includes(query) ||
+                    tipo.includes(query) ||
+                    testoRicerca.includes(query)
+                );
+                
+                // Mostra solo gli articoli che corrispondono ai filtri selezionati
+                if (matchLingua && matchQuery) {
+                    row.style.display = "";
+                    risultatiVisibili++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+    
+            // Se è in corso una ricerca, nasconde la paginazione
+            if (query !== "" || lingua !== "") {
+                pagination.style.display = "none";  // Nasconde la paginazione durante la ricerca
+            } else {
+                pagination.style.display = "flex";  // Riattiva la paginazione quando la ricerca è vuota
+                gestisciPaginazione();  // Ripristina la paginazione
+            }
+        }
+        
+        // Funzione per eseguire una ricerca sul backend Django
+        function ricercaArticoli() {
+            let query = searchInput.value.trim();
+            let lingua = languageFilter.value;
+            let folderId = "{{ folder.id }}";  // ID cartella fornito da Django
+    
+            fetch(`/articoli/ricerca/${folderId}/?q=${query}&lingua=${lingua}`)
+                .then(response => response.json())
+                .then(data => {
+                    aggiornaTabella(data.articoli); // Aggiorna la tabella con i risultati
+                    gestisciPaginazione(); // Ricarica la paginazione dopo il filtraggio
+                })
+                .catch(error => console.error("Errore nella ricerca:", error));
+        }
+    
+        // Assegna gli eventi ai campi di input e ai filtri
+        searchInput.addEventListener("input", filtraArticoli);
+        languageFilter.addEventListener("change", filtraArticoli);
+        gestisciPaginazione(); // Inizializza la paginazione
+
+        
+       // Funzione per aggiornare la tabella con nuovi articoli dopo la ricerca o il filtraggio
+        function aggiornaTabella(articoli) {
+            let tbody = document.querySelector("tbody");
+            tbody.innerHTML = ""; // Pulisce la tabella prima di riempirla con i nuovi dati
+        
+            if (articoli.length === 0) {
+                // Se non ci sono articoli, mostra un messaggio nella tabella
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">Nessun articolo trovato.</td></tr>`;
+                return;
+            }
+        
+            // Aggiunge gli articoli alla tabella
+            articoli.forEach(articolo => {
+                let row = document.createElement("tr");
+                row.setAttribute("data-id", articolo.id); // Assegna l'ID dell'articolo alla riga
+        
+                row.innerHTML = `
+                    <td>➤<a href="#" class="open-article-modal">${articolo.titolo}</a></td>
+                    <td>${articolo.autore || ""}</td>
+                    <td>${articolo.anno || ""}</td>
+                    <td>${articolo.citazioni || "0"}</td>
+                    <td>${articolo.fonte || ""}</td>
+                    <td>${articolo.lingua || ""}</td>
+                    <td>${articolo.tipo_documento || ""}</td>
+                    <td class="td-ellipsis">${articolo.text || ""}</td>
+                `;
+        
+                tbody.appendChild(row);
+                gestisciPaginazione(); // Ricarica la paginazione dopo aver aggiornato la tabella
+            });     
+        }
+    });
+</script>
+{% endblock %}    
+

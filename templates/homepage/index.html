@@ -1,0 +1,228 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piattaforma Literature Review</title>
+    <!-- Bootstrap & Custom CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    {% block extra_css %}
+        <link rel="stylesheet" href="{% static 'css/folders_css/index.css' %}">
+            <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">  
+    {% endblock %}
+
+</head>
+{% block script %}
+<script>
+    // Chiude automaticamente i messaggi di allerta dopo 3 secondi
+    setTimeout(() => {
+        let alertElements = document.querySelectorAll('.alert');
+        alertElements.forEach(alert => {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 3000);
+
+    
+</script>
+{% endblock %}
+<body>
+    <!-- Navbar -->
+    {% block nav %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a href="{% url 'folders:home' %}" class="navbar-brand d-flex align-items-center">
+                <img src="{% static 'logo.jpg' %}" alt="Logo" class="me-2" width="40">
+                <span class="fs-4">Piattaforma Literature Review</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Caratteristiche</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="{% url 'folders:home' %}" class="dropbtn">
+                            Utente <i class="bi bi-person-circle"></i>
+                        </a>
+                        <ul class="dropdown-content">
+                            {% if request.user.is_authenticated %}
+                                <li><a href="{% url 'userauths:sign-out' %}">Logout</a></li>
+                                <li><a href="{% url 'userauths:user-view' %}">Profilo</a></li>
+                            {% else %}
+                                <li><a href="{% url 'userauths:sign-up' %}">Registrati</a></li>
+                                <li><a href="{% url 'userauths:sign-in' %}">Accedi</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endblock %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <!-- Hero Section -->
+    {% block hero %}
+    <section class="hero">
+        <div class="container">
+            <h1>Ottimizza la tua ricerca accademica</h1>
+            <p class="lead">Un'interfaccia intuitiva che automatizza il processo di literature review.</p>
+            <a href="{% url 'folders:lista_cartelle' %}" class="btn btn-custom btn-primary me-2">Inizia Ora</a>
+            <a href="#gif-description-section" class="btn btn-custom btn-outline-light">Scopri di più</a>
+
+
+        </div>
+    </section>
+    
+    {% endblock %}
+
+    {% block container%}
+
+    {% endblock %}
+
+
+    {% block content %}
+    <!-- Contenuto delle altre pagine -->
+    {% endblock %}
+    
+    
+    {% block contact %}
+     <!-- Sezione Caratteristiche -->
+    <section id="features" class="features">
+        <h2 class="fw-bold mb-4" style="color: white;">Caratteristiche</h2>
+            <div class="scopri">
+                <div class="row g-4">
+                    <!-- Blocco per la funzione di Ricerca Intelligente -->
+                    <div class="col-md-4">
+                        <div class="feature-box">
+                            <i class="bi bi-gear-fill display-4"></i>
+                            <h5 class="mt-3">Ricerca Intelligente</h5>
+                            <p>Trova rapidamente gli articoli grazie a un sistema di filtraggio avanzato</p>
+                        </div>
+                    </div>
+                    <!-- Funzione di Gestione Organizzata -->
+                    <div class="col-md-4">
+                        <div class="feature-box">
+                            <i class="bi bi-laptop-fill display-4"></i>
+                            <h5 class="mt-3">Gestione Organizzata</h5>
+                            <p>Crea, modifica e gestisci cartelle personalizzate per archiviare e categorizzare gli articoli</p>
+                        </div>
+                    </div>
+                    <!-- Funzione di Salvataggio Rapido -->
+                    <div class="col-md-4">
+                        <div class="feature-box">
+                            <i class="bi bi-graph-up-arrow display-4"></i>
+                            <h5 class="mt-3">Salvataggio Rapido</h5>
+                            <p>Importa facilmente nuovi articoli nella tua libreria e salva quelli più importanti con un solo click</p>
+                        </div>
+                    </div>
+                </div>
+
+
+               
+            </div>
+    </section>
+
+    <!-- Sezione Esplora (GIF) -->
+    <section id="gif-description-section" class="gif-description-section">
+        <div class="container">
+            
+            <!-- Riga 1 - Immagine a sinistra, Testo a destra -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6 text-center">
+                    <img src="{% static 'media/hacker.gif' %}" alt="Automazione" class="gif-img">
+                </div>
+                <div class="col-md-6 text-white">
+                    <h3>Automazione</h3>
+                    <p>Ottimizza la ricerca accademica con strumenti avanzati e automazione del processo di selezione degli articoli</p>
+                </div>
+            </div>
+    
+            <!-- Riga 2 - Testo a sinistra, Immagine a destra -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6 text-white text-end">
+                    <h3>Analisi Dati</h3>
+                    <p>Filtra e analizza le fonti per migliorare l’efficacia della ricerca</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="{% static 'media/book.gif' %}" alt="Analisi Dati" class="gif-img">
+                </div>
+            </div>
+    
+            <!-- Riga 3 - Immagine a sinistra, Testo a destra -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6 text-center">
+                    <img src="{% static 'media/informatico.gif' %}" alt="Connessioni Accademiche" class="gif-img">
+                </div>
+                <div class="col-md-6 text-white">
+                    <h3>Connessioni Accademiche</h3>
+                    <p>Collega ricerche e fonti tra di loro per creare un database interconnesso</p>
+                </div>
+            </div>
+    
+            <!-- Riga 4 - Testo a sinistra, Immagine a destra -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6 text-white text-end">
+                    <h3>Tecnologia</h3>
+                    <p>Utilizza un’interfaccia moderna e interattiva per navigare tra le fonti e salvare gli articoli con un solo clic</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="{% static 'media/ricerca.gif' %}" alt="Tecnologia" class="gif-img">
+                </div>
+            </div>
+
+            <!-- Riga 5 - Immagine a sinistra, Testo a destra -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6 text-center">
+                    <img src="{% static 'media/art.gif' %}" alt="Connessioni Accademiche" class="gif-img">
+                </div>
+                <div class="col-md-6 text-white">
+                    <h3>Utilizzato per qualsiasi tipo di articolo</h3>
+                    <p>Viene utilizzato per un qualsiasi tipo di articolo</p>
+                </div>
+            </div>
+    
+        </div>
+    </section>
+    
+    <!-- Script per lo scroll fluido alla sezione "Esplora" -->
+    <script>
+        document.querySelector("a[href='#explore-section']").addEventListener("click", function (event) {
+            event.preventDefault();
+            document.querySelector("#explore-section").scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+    
+
+    {% endblock %}
+    
+
+    <!-- Footer -->
+    {% block footer %} 
+        <footer class="bg-dark text-center text-white py-3">
+            <div class="container">
+                <p>&copy; 2024 Piattaforma Literature Review. Tutti i diritti riservati.</p>
+            </div>
+        </footer>
+    {% endblock %}
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+  
+</body>
+</html>
+
+

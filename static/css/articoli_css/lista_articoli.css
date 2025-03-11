@@ -1,0 +1,190 @@
+.td-ellipsis {
+    max-width: 200px; /* Imposta una larghezza massima per la cella */
+    white-space: nowrap; /* Impedisce al testo di andare a capo */
+    overflow: hidden; /* Nasconde il testo in eccesso */
+    text-overflow: ellipsis; /* Aggiunge i puntini di sospensione (...) */
+}
+
+.custom-file {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 250px;
+}
+
+.custom-file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* Nasconde il campo file */
+    cursor: pointer;
+}
+
+.custom-file-label {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: white;
+    border: 2px solid #007bff;
+    color: #007bff;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.custom-file-label:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Stile generale per i pulsanti */
+.btn-custom {
+    border-radius: 8px;
+    padding: 4px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Stile per il pulsante "Scegli File" */
+.custom-file-input {
+    display: none; /* Nasconde l'input */
+}
+
+.custom-file-label {
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    border: 2px solid transparent;
+}
+
+.custom-file-label:hover {
+    background-color: #0056b3;
+    border: 2px solid #ffffff;
+}
+
+/* Pulsante Importa */
+.btn-importa {
+    background-color: #17a2b8;
+    color: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-importa:hover {
+    background-color: #128194;
+    transform: scale(1.05);
+}
+
+/* Pulsante Salva */
+.btn-salva {
+    background-color: #28a745;
+    color: white;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-salva:hover {
+    background-color: #1e7e34;
+    transform: scale(1.05);
+}
+
+/* Pulsante Aggiungi */
+.btn-aggiungi {
+    background-color: #ffc107;
+    color: black;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-aggiungi:hover {
+    background-color: #e0a800;
+    transform: scale(1.05);
+}
+
+
+#importa-articoli-form {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Spazio tra input e bottone */
+}
+
+#import-button {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 10px 0;
+    list-style: none;
+}
+
+.pagination .page-item {
+    margin: 3px;
+}
+
+.pagination .page-item .page-link {
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #007bff;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.pagination .page-item .page-link:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination .active .page-link {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+.pagination .disabled .page-link {
+    color: #ccc;
+    pointer-events: none;
+}
+
+.info-icon {
+    font-size: 1.2rem;
+    color: #007bff;
+    cursor: pointer;
+}
+
+.info-icon:hover {
+    color: #0056b3;
+}

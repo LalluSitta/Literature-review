@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggiorna Profilo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/userauths_css/user_styles.css' %}">
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1>Aggiorna Profilo</h1>
+        </div>
+        {% if form.errors %}
+        <div class="alert-danger alert">
+            <strong>{{ form.errors }}</strong>                   
+        </div>
+        {% endif %}
+         <!-- Card che contiene il modulo e l'immagine del profilo -->
+        <div class="profile-card">
+            <div class="profile-image">
+                {% if profile.image %}
+                <!-- Se l'utente ha un'immagine profilo, la visualizza -->
+                <img src="{{ profile.image.url }}" style="width: 150px; height: 150px;" alt="Immagine profilo">
+                {% else %}
+                <!-- Se l'utente non ha un'immagine profilo, mostra un'icona predefinita -->
+                <img src="{% static 'media/def_user.jpg' %}" alt="User Avatar" class="avatar"></a>
+                {% endif %}
+            </div>
+            <!-- Modulo per l'aggiornamento delle informazioni -->
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Campo per il nome completo -->
+                <div class="mb-3">
+                    {{form.full_name}}
+                </div>
+
+                <!-- Campo per la biografia -->
+                <div class="mb-3">
+                    {{form.bio}}
+                </div>
+
+                <!-- Campo per il numero di telefono -->
+                <div class="mb-3">
+                    {{form.phone}}
+                </div>
+
+                <!-- Campo per l'aggiornamento dell'immagine del profilo -->
+                <div class="mb-3">
+                    {{form.image}}
+                </div>
+
+                <!-- Pulsante per salvare i cambiamenti -->
+                <button class="btn btn-success" type="submit">Salva Cambiamenti</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

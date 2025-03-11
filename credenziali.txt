@@ -1,0 +1,6 @@
+
+---> superuser <----
+
+E : lallu2@hotmail.it
+p : admin
+name : admin

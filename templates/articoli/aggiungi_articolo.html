@@ -1,0 +1,111 @@
+{% extends 'homepage/index.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/folders_css/folders.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/articoli_css/lista_articoli.css' %}">
+    <link rel="stylesheet" href="{% static 'css/articoli_css/aggiungi_articolo.css' %}">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <!-- Pulsante per tornare alla lista articoli della cartella corrente -->
+        <a href="{% url 'articoli:articoli_per_cartella' folder_id=folder.id %}" class="btn btn-light me-3">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <span class="navbar-brand">Piattaforma Literature Review</span>
+    </div>
+</nav>
+{% endblock %}
+
+{% block hero %}
+    <div>
+        <img src="{% static 'media/sfondo1.jpg' %}" alt="copertina" class="hero-image"></img>
+    </div>
+{% endblock %}
+
+
+{% block container %}
+<section class="hero2">
+    <div class="container mt-5">
+        <h2 "text-center text-white fw-bold">Aggiungi un Nuovo Articolo</h2>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center mt-4">
+    <div class="card p-4 shadow-lg" style="max-width: 900px; width: 100%;">
+        <!-- Form per aggiungere un nuovo articolo -->
+        <form method="POST" class="row g-4">
+            {% csrf_token %}
+
+            <!-- Riga 1: Titolo -->
+            <div class="col-12">
+                <label class="form-label fw-bold">Titolo</label>
+                {{ form.titolo }}
+            </div>
+
+            <!-- Riga 2: Autore e Anno -->
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Autore</label>
+                {{ form.autore }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Anno</label>
+                {{ form.anno }}
+            </div>
+
+            <!-- Riga 3: Citazioni e Fonte -->
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Citazioni</label>
+                {{ form.citazioni }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Fonte</label>
+                {{ form.fonte }}
+            </div>
+
+            <!-- Riga 4: Lingua e Tipo Documento -->
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Lingua</label>
+                {{ form.lingua }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Tipo Documento</label>
+                {{ form.tipo_documento }}
+            </div>
+
+            <!-- Riga 5: Stato -->
+            <div class="col-12">
+                <label class="form-label fw-bold">Stato</label>
+                {{ form.status }}
+            </div>
+
+            <!-- Riga 6: Testo della Ricerca -->
+            <div class="col-12">
+                <label class="form-label fw-bold">Testo della Ricerca</label>
+                {{ form.text }}
+            </div>
+
+            <!-- Pulsante Salva -->
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-success px-4 py-2 rounded-3">
+                    <i class="fas fa-save"></i> Salva
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block contact %}
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
