@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 
 # Modello personalizzato per la gestione degli utenti, estendendo il modello predefinito di Django
-# e aggiungendo campi extra come email univoca, biografia e flag per i fornitori
+# e aggiungendo campi extra come email univoca, biografia
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=100)
